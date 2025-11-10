@@ -1,11 +1,11 @@
 from legacy.preco_calculadora import calcular_preco
 
 def processar_pedido(p):
-    prod = p.get("produto")
+    prod = (p.get("produto") or "").strip().lower() if isinstance(p.get("produto"), str) else p.get("produto")
     qtd = p.get("qtd")
-    cupom = p.get("cupom")
+    cupom = (p.get("cupom") or "").strip().upper() if isinstance(p.get("cupom"), str) else p.get("cupom")
 
-    if qtd == 0:
+    if qtd is None or qtd <= 0:
         print("qtd zero, retornando 0")
         return 0
 
@@ -15,23 +15,18 @@ def processar_pedido(p):
         preco = 0
 
     if cupom == "MEGA10":
-        preco = preco - (preco * 0.1)
-    else:
-        if cupom == "NOVO5":
-            preco = preco - (preco * 0.05)
-        else:
-            if cupom == "LUB2" and prod == "lubrificante":
-                preco = preco - 2
-            else:
-                preco = preco
+        preco = preco * 0.9
+    elif cupom == "NOVO5":
+        preco = preco * 0.95
+    elif cupom == "LUB2" and prod == "lubrificante":
+        preco = max(0, preco - 2)
 
     if prod == "diesel":
         preco = round(preco, 0)
+    elif prod == "gasolina":
+        preco = round(preco, 2)
     else:
-        if prod == "gasolina":
-            preco = round(preco, 2)
-        else:
-            preco = float(int(preco * 100) / 100.0)
+        preco = round(preco, 2)
 
-    print("pedido ok:", p["cliente"], prod, qtd, "=>", preco)
+    print("pedido ok:", p.get("cliente", "desconhecido"), prod, qtd, "=>", preco)
     return preco

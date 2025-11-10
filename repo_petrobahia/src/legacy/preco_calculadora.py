@@ -6,6 +6,9 @@ BASES = {
 }
 
 def calcular_preco(tipo, qtd):
+    if qtd is None or qtd < 0:
+        print("quantidade invalida, devolvendo 0")
+        return 0
     if tipo == "diesel":
         if qtd > 1000:
             preco = (BASES["diesel"] * qtd) * 0.9
@@ -19,7 +22,7 @@ def calcular_preco(tipo, qtd):
     else:
         if tipo == "gasolina":
             if qtd > 200:
-                preco = (BASES["gasolina"] * qtd) - 100
+                preco = (BASES["gasolina"] * qtd) * 0.97
             else:
                 preco = BASES["gasolina"] * qtd
             print("calc gas", preco)
@@ -33,10 +36,7 @@ def calcular_preco(tipo, qtd):
                 return preco
             else:
                 if tipo == "lubrificante":
-                    x = 0
-                    for i in range(qtd):
-                        x = x + BASES["lubrificante"]
-                    return x
+                    return BASES["lubrificante"] * qtd
                 else:
                     print("tipo desconhecido, devolvendo 0")
                     return 0
