@@ -1,10 +1,40 @@
-from legacy.preco_calculadora import calcular_preco
+from __future__ import annotations
 
-def processar_pedido(p):
-    prod = (p.get("produto") or "").strip().lower() if isinstance(p.get("produto"), str) else p.get("produto")
-    qtd = p.get("qtd")
-    cupom = (p.get("cupom") or "").strip().upper() if isinstance(p.get("cupom"), str) else p.get("cupom")
+from dataclasses import dataclass
+from typing import Any, Dict
 
+from .preco_calculadora import calcular_preco
+
+
+@dataclass(frozen=True)
+class Pedido:
+    cliente: str
+    produto: str
+    quantidade: float
+    cupom: str | None = None
+
+
+CUPONS = {
+    "MEGA10": lambda preco, produto: preco * 0.9,
+    "NOVO5": lambda preco, produto: preco * 0.95,
+    "LUB2": lambda preco, produto: max(0, preco - 2) if produto == "lubrificante" else preco,
+}
+
+
+def _normalizar_produto(valor: Any) -> str:
+    return (valor or "").strip().lower() if isinstance(valor, str) else str(valor)
+
+
+def _normalizar_cupom(valor: Any) -> str | None:
+    if valor is None or not isinstance(valor, str):
+        return None
+    valor = valor.strip().upper()
+    return valor or None
+
+
+def processar_pedido(pedido: Dict[str, Any]) -> float:
+    prod = _normalizar_produto(pedido.get("produto"))
+    qtd = pedido.get("qtd")
     if qtd is None or qtd <= 0:
         print("qtd zero, retornando 0")
         return 0
@@ -14,19 +44,10 @@ def processar_pedido(p):
         print("algo deu errado, preco negativo")
         preco = 0
 
-    if cupom == "MEGA10":
-        preco = preco * 0.9
-    elif cupom == "NOVO5":
-        preco = preco * 0.95
-    elif cupom == "LUB2" and prod == "lubrificante":
-        preco = max(0, preco - 2)
+    cupom = _normalizar_cupom(pedido.get("cupom"))
+    if cupom and cupom in CUPONS:
+        preco = CUPONS[cupom](preco, prod)
 
-    if prod == "diesel":
-        preco = round(preco, 0)
-    elif prod == "gasolina":
-        preco = round(preco, 2)
-    else:
-        preco = round(preco, 2)
-
-    print("pedido ok:", p.get("cliente", "desconhecido"), prod, qtd, "=>", preco)
+    preco = round(preco, 2 if prod != "diesel" else 0)
+    print("pedido ok:", pedido.get("cliente", "desconhecido"), prod, qtd, "=>", preco)
     return preco

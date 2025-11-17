@@ -1,0 +1,26 @@
+[MASTER]
+ignore = venv
+jobs = 0
+persistent = yes
+init-hook=import sys; sys.path.append("src")
+
+[MESSAGES CONTROL]
+disable =
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    broad-except
+
+[FORMAT]
+max-line-length = 100
+
+[DESIGN]
+max-args = 6
+max-branches = 12
+max-attributes = 10
+
+[TYPECHECK]
+generated-members =
+
+

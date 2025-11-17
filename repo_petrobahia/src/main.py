@@ -1,5 +1,5 @@
-from legacy.pedido_service import processar_pedido
-from legacy.clientes import cadastrar_cliente
+from .legacy.clientes import cadastrar_cliente
+from .legacy.pedido_service import processar_pedido
 
 pedidos = [
     {"cliente": "TransLog", "produto": "diesel", "qtd": 1200, "cupom": "MEGA10"},
@@ -12,6 +12,7 @@ clientes = [
     {"nome": "Ana Paula", "email": "ana@petrobahia.com", "cnpj": "12345678000199"},
     {"nome": "Carlos", "email": "carlos@petrobahia.com", "cnpj": "98765432000155"},
 ]
+
 
 def main():
     print("==== Início processamento PetroBahia ====")
@@ -31,6 +32,7 @@ def main():
 
     print("TOTAL =", sum(valores))
     print("==== Fim processamento PetroBahia ====")
+
 
 if __name__ == "__main__":
     main()
